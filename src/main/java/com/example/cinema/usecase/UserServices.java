@@ -7,6 +7,7 @@ import com.example.cinema.exceptions.UserException;
 import com.example.cinema.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -37,17 +38,28 @@ public class UserServices {
 
     public Mono<UserDTO> saveUser(UserDTO userDTO) {
         return Mono.just(userDTO)
-                .filter(user -> Objects.nonNull(user.getName()))
-                .filter(user -> Objects.nonNull(user.getLastname()))
-                .flatMap(user -> userRepository.save(UserDocument.builder()
-                        .name(user.getName())
-                        .lastname(user.getLastname())
-                        .build()))
+                .filter(userData -> Objects.nonNull(userData.getId()))
+                .flatMap(userData -> findById(userDTO.getId())
+                        .map(userEdit -> UserDocument.builder()
+                                .id(userEdit.getId())
+                                .name(userDTO.getName())
+                                .lastname(userDTO.getLastname())
+                                .build())
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(UserErrorEnum.USER_IS_NOT_EXISTS)))))
+                .switchIfEmpty(Mono.defer(() -> Mono.just(userDTO)
+                        .filter(user -> Objects.nonNull(userDTO.getName()))
+                        .filter(user -> Objects.nonNull(userDTO.getLastname()))
+                        .map(userNew -> UserDocument.builder()
+                                .name(userDTO.getName())
+                                .lastname(userDTO.getLastname())
+                                .build())
+                ))
+                .flatMap(userRepository::save)
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(UserErrorEnum.NON_EMPTY_FIELDS))))
                 .thenReturn(userDTO);
     }
 
-    public Mono<Void> deleteUser(String userId){
+    public Mono<Void> deleteUser(String userId) {
         return userRepository.deleteById(userId);
     }
 }
