@@ -6,7 +6,7 @@ import com.example.cinema.model.Showtime;
 
 public interface ShowtimeFactory {
 
-    default Showtime buildShowtime(ShowtimeDocument showtimeDocument){
+    default Showtime buildShowtime(ShowtimeDocument showtimeDocument) {
         return Showtime.builder()
                 .id(showtimeDocument.getId())
                 .date(showtimeDocument.getDate())
@@ -14,7 +14,7 @@ public interface ShowtimeFactory {
                 .build();
     }
 
-    default ShowtimeDocument editBuildShowtime(ShowtimeDTO showtimeDTO){
+    default ShowtimeDocument editBuildShowtime(ShowtimeDTO showtimeDTO) {
         return ShowtimeDocument.builder()
                 .id(showtimeDTO.getId())
                 .date(showtimeDTO.getDate())
@@ -22,7 +22,7 @@ public interface ShowtimeFactory {
                 .build();
     }
 
-    default ShowtimeDocument saveBuildShowtime(ShowtimeDTO showtimeDTO){
+    default ShowtimeDocument saveBuildShowtime(ShowtimeDTO showtimeDTO) {
         return ShowtimeDocument.builder()
                 .date(showtimeDTO.getDate())
                 .movies(showtimeDTO.getMovies())

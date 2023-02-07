@@ -56,19 +56,19 @@ public class ShowtimeServices implements ShowtimeFactory {
                         .build());
     }
 
-    public Mono<ShowtimeDTO> saveShowtime(ShowtimeDTO showtimeDTO){
+    public Mono<ShowtimeDTO> saveShowtime(ShowtimeDTO showtimeDTO) {
         return Mono.just(showtimeDTO)
                 .filter(showtimeData -> Objects.nonNull(showtimeData.getDate()))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 .filter(showtimeData -> Objects.nonNull(showtimeDTO.getId()))
                 .flatMap(showtimeData -> findById(showtimeDTO.getId())
                         .map(this::editBuildShowtime)
-                        .switchIfEmpty(Mono.defer(()-> Mono.error(new ShowtimeException(ShowtimeErrorEnum.SHOWTIME_IS_NOT_EXISTS))))
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new ShowtimeException(ShowtimeErrorEnum.SHOWTIME_IS_NOT_EXISTS))))
                 )
-                .switchIfEmpty(Mono.defer(()-> Mono.just(showtimeDTO)
+                .switchIfEmpty(Mono.defer(() -> Mono.just(showtimeDTO)
                         .map(this::saveBuildShowtime)
                 ))
                 .flatMap(showtimeRepository::save)
-                .switchIfEmpty(Mono.defer(()-> Mono.error(new MovieException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 .thenReturn(showtimeDTO);
     }
 }

@@ -38,9 +38,9 @@ public class UserServices implements UserFactory {
                         .filter(user -> Objects.nonNull(userDTO.getName()))
                         .filter(user -> Objects.nonNull(userDTO.getLastname()))
                         .map(this::saveBuildUser)
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 ))
                 .flatMap(userRepository::save)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 .thenReturn(userDTO);
     }
 

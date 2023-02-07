@@ -14,17 +14,17 @@ public class ShowtimeController {
     private final ShowtimeServices showtimeServices;
 
     @GetMapping("/api/showtime")
-    public Flux<ShowtimeDTO> findAll(){
+    public Flux<ShowtimeDTO> findAll() {
         return showtimeServices.findAll();
     }
 
     @GetMapping("/api/showtime/{id}")
-    public Mono<ShowtimeDTO> findById(@PathVariable(value = "id") String showtimeId){
+    public Mono<ShowtimeDTO> findById(@PathVariable(value = "id") String showtimeId) {
         return showtimeServices.findById(showtimeId);
     }
 
     @PostMapping("/api/showtime")
-    public Mono<ShowtimeDTO> saveShowtime(@RequestBody ShowtimeDTO showtimeDTO){
+    public Mono<ShowtimeDTO> saveShowtime(@RequestBody ShowtimeDTO showtimeDTO) {
         return showtimeServices.saveShowtime(showtimeDTO);
     }
 }

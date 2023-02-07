@@ -22,41 +22,41 @@ public class MovieServices implements MovieFactory {
     private final MovieRepository movieRepository;
     private static final Integer MAXIMUM_RANGE = 5;
 
-    public Flux<MovieDTO> findAll(){
+    public Flux<MovieDTO> findAll() {
         return movieRepository.findAll()
                 .map(this::buildMovieDTO);
     }
 
-    public Mono<MovieDTO> findById(String movieId){
+    public Mono<MovieDTO> findById(String movieId) {
         return movieRepository.findById(movieId)
                 .map(this::buildMovieDTO);
     }
 
-    public Flux<MovieDTO> findByIdIn(List<String> movieId){
+    public Flux<MovieDTO> findByIdIn(List<String> movieId) {
         return movieRepository.findAllById(movieId)
                 .map(this::buildMovieDTO);
     }
 
-    public Mono<MovieDTO> saveMovie(MovieDTO movieDTO){
+    public Mono<MovieDTO> saveMovie(MovieDTO movieDTO) {
         return Mono.just(movieDTO)
                 .filter(movieData -> movieData.getRating() >= NumberUtils.INTEGER_ONE && movieData.getRating() <= MAXIMUM_RANGE)
-                .switchIfEmpty(Mono.defer(()-> Mono.error(new MovieException(MovieErrorEnum.NO_RANGE_MOVIE))))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(MovieErrorEnum.NO_RANGE_MOVIE))))
                 .filter(movieData -> Objects.nonNull(movieDTO.getId()))
                 .flatMap(movieData -> findById(movieDTO.getId())
                         .map(this::editBuildMovie)
-                        .switchIfEmpty(Mono.defer(()-> Mono.error(new MovieException(MovieErrorEnum.MOVIE_IS_NOT_EXISTS))))
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(MovieErrorEnum.MOVIE_IS_NOT_EXISTS))))
                 )
-                .switchIfEmpty(Mono.defer(()-> Mono.just(movieDTO)
+                .switchIfEmpty(Mono.defer(() -> Mono.just(movieDTO)
                         .filter(user -> Objects.nonNull(movieDTO.getTitle()))
                         .filter(user -> Objects.nonNull(movieDTO.getDirector()))
                         .map(this::saveBuildMovie)
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 ))
                 .flatMap(movieRepository::save)
-                .switchIfEmpty(Mono.defer(()-> Mono.error(new MovieException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 .thenReturn(movieDTO);
     }
 
-    public Mono<Void> deleteMovie(String movieId){
+    public Mono<Void> deleteMovie(String movieId) {
         return movieRepository.deleteById(movieId);
     }
 
