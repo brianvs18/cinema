@@ -1,12 +1,12 @@
 package com.example.cinema.usecase;
 
-import com.example.cinema.dto.MovieDTO;
 import com.example.cinema.dto.ShowtimeDTO;
 import com.example.cinema.enums.GenericErrorEnum;
 import com.example.cinema.enums.ShowtimeErrorEnum;
 import com.example.cinema.exceptions.MovieException;
 import com.example.cinema.exceptions.ShowtimeException;
 import com.example.cinema.factory.ShowtimeFactory;
+import com.example.cinema.usecase.common.functions.MovieListFunction;
 import com.example.cinema.model.Showtime;
 import com.example.cinema.repository.ShowtimeRepository;
 import lombok.RequiredArgsConstructor;
@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -22,7 +21,7 @@ import java.util.Objects;
 public class ShowtimeServices implements ShowtimeFactory {
 
     private final ShowtimeRepository showtimeRepository;
-    private final MovieServices movieServices;
+    private final MovieListFunction function;
 
     public Flux<ShowtimeDTO> findAll() {
         return showtimeRepository.findAll()
@@ -36,19 +35,8 @@ public class ShowtimeServices implements ShowtimeFactory {
                 .flatMap(this::buildShowtimeWithMovieList);
     }
 
-    private Mono<List<MovieDTO>> mapMoviesList(List<String> movies) {
-        return movieServices.findByIdIn(movies)
-                .map(movieDTO -> movieDTO.toBuilder()
-                        .id(movieDTO.getId())
-                        .title(movieDTO.getTitle())
-                        .director(movieDTO.getDirector())
-                        .rating(movieDTO.getRating())
-                        .build())
-                .collectList();
-    }
-
     private Mono<ShowtimeDTO> buildShowtimeWithMovieList(Showtime showtime) {
-        return mapMoviesList(showtime.getMovies())
+        return function.mapMoviesList(showtime.getMovies())
                 .map(movieDTOS -> ShowtimeDTO.builder()
                         .id(showtime.getId())
                         .date(showtime.getDate())
