@@ -32,7 +32,7 @@ public class UserServices implements UserFactory {
         return Mono.just(userDTO)
                 .filter(userData -> Objects.nonNull(userData.getId()))
                 .flatMap(userData -> findById(userDTO.getId())
-                        .map(this::editUser)
+                        .map(this::editBuildUser)
                         .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(UserErrorEnum.USER_IS_NOT_EXISTS)))))
                 .switchIfEmpty(Mono.defer(() -> Mono.just(userDTO)
                         .filter(user -> Objects.nonNull(userDTO.getName()))

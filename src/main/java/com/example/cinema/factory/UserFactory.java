@@ -13,7 +13,7 @@ public interface UserFactory {
                 .build();
     }
 
-    default UserDocument editUser(UserDTO userDTO){
+    default UserDocument editBuildUser(UserDTO userDTO){
         return UserDocument.builder()
                 .id(userDTO.getId())
                 .name(userDTO.getName())

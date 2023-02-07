@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
 import java.util.Objects;
 
 @Service
@@ -26,6 +27,11 @@ public class MovieServices implements MovieFactory {
 
     public Mono<MovieDTO> findById(String movieId){
         return movieRepository.findById(movieId)
+                .map(this::buildMovieDTO);
+    }
+
+    public Flux<MovieDTO> findByIdIn(List<String> movieId){
+        return movieRepository.findAllById(movieId)
                 .map(this::buildMovieDTO);
     }
 
