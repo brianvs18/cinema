@@ -13,22 +13,22 @@ public class MovieController {
 
     private final MovieServices movieServices;
 
-    @GetMapping("/movies")
+    @GetMapping("/api/movies")
     public Flux<MovieDTO> findAll(){
         return movieServices.findAll();
     }
 
-    @GetMapping("/movies/{id}")
+    @GetMapping("/api/movies/{id}")
     public Mono<MovieDTO> findById(@PathVariable(value = "id") String movieId){
         return movieServices.findById(movieId);
     }
 
-    @PostMapping("/movies")
+    @PostMapping("/api/movies")
     public Mono<MovieDTO> saveMovie(@RequestBody MovieDTO movie){
         return movieServices.saveMovie(movie);
     }
 
-    @DeleteMapping("movies/{id}")
+    @DeleteMapping("/api/movies/{id}")
     public Mono<Void> deleteMovie(@PathVariable(value = "id") String movieId){
         return movieServices.deleteMovie(movieId);
     }

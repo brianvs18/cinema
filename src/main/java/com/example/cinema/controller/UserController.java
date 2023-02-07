@@ -12,22 +12,22 @@ import reactor.core.publisher.Mono;
 public class UserController {
     private final UserServices userServices;
 
-    @GetMapping("/users")
+    @GetMapping("/api/users")
     public Flux<UserDTO> finAll() {
         return userServices.findAll();
     }
 
-    @GetMapping("/users/{id}")
+    @GetMapping("/api/users/{id}")
     public Mono<UserDTO> findById(@PathVariable(value = "id") String userId) {
         return userServices.findById(userId);
     }
 
-    @PostMapping("/users")
+    @PostMapping("/api/users")
     public Mono<UserDTO> saveUser(@RequestBody UserDTO user) {
         return userServices.saveUser(user);
     }
 
-    @DeleteMapping("/users/{id}")
+    @DeleteMapping("/api/users/{id}")
     public Mono<Void> deleteUser(@PathVariable(value = "id") String userId) {
         return userServices.deleteUser(userId);
     }

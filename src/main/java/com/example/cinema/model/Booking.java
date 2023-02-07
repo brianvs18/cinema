@@ -1,4 +1,4 @@
-package com.example.cinema.dto;
+package com.example.cinema.model;
 
 import lombok.*;
 
@@ -9,9 +9,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
-public class ShowtimeDTO {
+public class Booking {
     private String id;
-    private Long date;
-    private List<MovieDTO> moviesList;
+    private String userId;
+    private String showtimeId;
     private List<String> movies;
 }
