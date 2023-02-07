@@ -1,7 +1,6 @@
 package com.example.cinema.usecase;
 
 import com.example.cinema.dto.UserDTO;
-import com.example.cinema.entity.UserDocument;
 import com.example.cinema.enums.GenericErrorEnum;
 import com.example.cinema.enums.UserErrorEnum;
 import com.example.cinema.exceptions.GenericException;
@@ -20,6 +19,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserServices implements UserFactory {
     private final UserRepository userRepository;
+    private final BookingServices bookingServices;
 
     public Flux<UserDTO> findAll() {
         return userRepository.findAll()
@@ -47,6 +47,8 @@ public class UserServices implements UserFactory {
     }
 
     public Mono<Void> deleteUser(String userId) {
-        return userRepository.deleteById(userId);
+        return bookingServices.findAllByUserId(userId)
+                .switchIfEmpty(userRepository.deleteById(userId).then(Mono.empty()))
+                .then();
     }
 }

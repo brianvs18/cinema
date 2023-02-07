@@ -1,5 +1,6 @@
 package com.example.cinema.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder(toBuilder = true)
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class ShowtimeDTO {
     private String id;
     private Long date;

@@ -37,6 +37,12 @@ public class BookingServices implements BookingFactory {
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new BookingException(BookingErrorEnum.BOOKING_NOT_EXISTS))));
     }
 
+    public Mono<BookingDTO> findByUserId(String userId) {
+        return bookingRepository.findByUserId(userId)
+                .map(this::buildBooking)
+                .flatMap(this::buildBookingWithMovieList);
+    }
+
     public Flux<BookingDTO> findAllByUserId(String userId) {
         return bookingRepository.findAllByUserId(userId)
                 .map(this::buildBooking)
