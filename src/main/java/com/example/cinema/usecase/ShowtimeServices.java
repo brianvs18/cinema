@@ -3,12 +3,12 @@ package com.example.cinema.usecase;
 import com.example.cinema.dto.ShowtimeDTO;
 import com.example.cinema.enums.GenericErrorEnum;
 import com.example.cinema.enums.ShowtimeErrorEnum;
-import com.example.cinema.exceptions.MovieException;
+import com.example.cinema.exceptions.GenericException;
 import com.example.cinema.exceptions.ShowtimeException;
 import com.example.cinema.factory.ShowtimeFactory;
-import com.example.cinema.usecase.common.functions.MovieListFunction;
 import com.example.cinema.model.Showtime;
 import com.example.cinema.repository.ShowtimeRepository;
+import com.example.cinema.usecase.common.functions.MovieListFunction;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -47,7 +47,7 @@ public class ShowtimeServices implements ShowtimeFactory {
     public Mono<ShowtimeDTO> saveShowtime(ShowtimeDTO showtimeDTO) {
         return Mono.just(showtimeDTO)
                 .filter(showtimeData -> Objects.nonNull(showtimeData.getDate()))
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(GenericErrorEnum.NON_EMPTY_FIELDS))))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 .filter(showtimeData -> Objects.nonNull(showtimeDTO.getId()))
                 .flatMap(showtimeData -> findById(showtimeDTO.getId())
                         .map(this::editBuildShowtime)

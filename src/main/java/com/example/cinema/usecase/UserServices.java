@@ -1,12 +1,15 @@
 package com.example.cinema.usecase;
 
 import com.example.cinema.dto.UserDTO;
+import com.example.cinema.entity.UserDocument;
 import com.example.cinema.enums.GenericErrorEnum;
 import com.example.cinema.enums.UserErrorEnum;
+import com.example.cinema.exceptions.GenericException;
 import com.example.cinema.exceptions.UserException;
 import com.example.cinema.factory.UserFactory;
 import com.example.cinema.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -30,14 +33,14 @@ public class UserServices implements UserFactory {
 
     public Mono<UserDTO> saveUser(UserDTO userDTO) {
         return Mono.just(userDTO)
+                .filter(user -> StringUtils.isNotBlank(userDTO.getName()) && StringUtils.isNotBlank(userDTO.getLastname()))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 .filter(userData -> Objects.nonNull(userData.getId()))
                 .flatMap(userData -> findById(userDTO.getId())
-                        .map(this::editBuildUser)
+                        .map(userDB -> editBuildUser(userDTO, userDB))
                         .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(UserErrorEnum.USER_IS_NOT_EXISTS)))))
                 .switchIfEmpty(Mono.defer(() -> Mono.just(userDTO)
-                        .filter(user -> Objects.nonNull(userDTO.getName()) && Objects.nonNull(userDTO.getLastname()))
                         .map(this::saveBuildUser)
-                        .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 ))
                 .flatMap(userRepository::save)
                 .thenReturn(userDTO);

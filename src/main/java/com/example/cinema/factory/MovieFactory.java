@@ -14,9 +14,9 @@ public interface MovieFactory {
                 .build();
     }
 
-    default MovieDocument editBuildMovie(MovieDTO movieDTO){
+    default MovieDocument editBuildMovie(MovieDTO movieDTO, MovieDTO movieDB){
         return MovieDocument.builder()
-                .id(movieDTO.getId())
+                .id(movieDB.getId())
                 .title(movieDTO.getTitle())
                 .director(movieDTO.getDirector())
                 .rating(movieDTO.getRating())

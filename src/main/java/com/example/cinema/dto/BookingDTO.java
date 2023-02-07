@@ -12,5 +12,6 @@ public class BookingDTO {
     private String id;
     private String userId;
     private String showtimeId;
-    private List<MovieDTO> movies;
+    private List<MovieDTO> moviesList;
+    private List<String> movies;
 }

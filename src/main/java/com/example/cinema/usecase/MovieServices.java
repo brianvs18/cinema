@@ -3,6 +3,7 @@ package com.example.cinema.usecase;
 import com.example.cinema.dto.MovieDTO;
 import com.example.cinema.enums.GenericErrorEnum;
 import com.example.cinema.enums.MovieErrorEnum;
+import com.example.cinema.exceptions.GenericException;
 import com.example.cinema.exceptions.MovieException;
 import com.example.cinema.factory.MovieFactory;
 import com.example.cinema.repository.MovieRepository;
@@ -43,13 +44,13 @@ public class MovieServices implements MovieFactory {
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(MovieErrorEnum.NO_RANGE_MOVIE))))
                 .filter(movieData -> Objects.nonNull(movieDTO.getId()))
                 .flatMap(movieData -> findById(movieDTO.getId())
-                        .map(this::editBuildMovie)
+                        .map(movieDB -> editBuildMovie(movieDTO, movieDB))
                         .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(MovieErrorEnum.MOVIE_IS_NOT_EXISTS))))
                 )
                 .switchIfEmpty(Mono.defer(() -> Mono.just(movieDTO)
                         .filter(user -> Objects.nonNull(movieDTO.getTitle()) && Objects.nonNull(movieDTO.getDirector()))
                         .map(this::saveBuildMovie)
-                        .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(GenericErrorEnum.NON_EMPTY_FIELDS))))
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
                 ))
                 .flatMap(movieRepository::save)
                 .thenReturn(movieDTO);

@@ -13,9 +13,9 @@ public interface UserFactory {
                 .build();
     }
 
-    default UserDocument editBuildUser(UserDTO userDTO){
+    default UserDocument editBuildUser(UserDTO userDTO, UserDTO userDB){
         return UserDocument.builder()
-                .id(userDTO.getId())
+                .id(userDB.getId())
                 .name(userDTO.getName())
                 .lastname(userDTO.getLastname())
                 .build();

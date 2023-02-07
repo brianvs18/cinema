@@ -22,13 +22,19 @@ public class BookingController {
         return bookingServices.findById(bookingId);
     }
 
-    /*@PostMapping("/api/bookings")
+    @GetMapping(path = "/api/bookings", params = {"userId"})
+    public Flux<BookingDTO> findAllByUserId(@RequestParam("userId") String userId){
+        return bookingServices.findAllByUserId(userId);
+    }
+
+    @PostMapping("/api/bookings")
     public Mono<BookingDTO> saveBooking(@RequestBody BookingDTO booking){
         return bookingServices.saveBooking(booking);
     }
 
+
     @DeleteMapping("/api/bookings/{id}")
     public Mono<Void> deleteBooking(@PathVariable(value = "id") String bookingId){
         return bookingServices.deleteBooking(bookingId);
-    }*/
+    }
 }
