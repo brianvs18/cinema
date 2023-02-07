@@ -47,7 +47,7 @@ public class ShowtimeServices implements ShowtimeFactory {
     public Mono<ShowtimeDTO> saveShowtime(ShowtimeDTO showtimeDTO) {
         return Mono.just(showtimeDTO)
                 .filter(showtimeData -> Objects.nonNull(showtimeData.getDate()))
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NO_EMPTY_FIELDS))))
                 .filter(showtimeData -> Objects.nonNull(showtimeDTO.getId()))
                 .flatMap(showtimeData -> findById(showtimeDTO.getId())
                         .map(this::editBuildShowtime)

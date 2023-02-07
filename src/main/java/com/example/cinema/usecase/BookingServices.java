@@ -57,7 +57,7 @@ public class BookingServices implements BookingFactory {
                         .showtimeId(bookingDTO.getShowtimeId())
                         .movies(bookingDTO.getMovies())
                         .build())
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NO_EMPTY_FIELDS))))
                 .flatMap(bookingRepository::save)
                 .thenReturn(bookingDTO);
     }

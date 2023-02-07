@@ -41,7 +41,7 @@ public class MovieServices implements MovieFactory {
     public Mono<MovieDTO> saveMovie(MovieDTO movieDTO) {
         return Mono.just(movieDTO)
                 .filter(movieData -> movieData.getRating() >= NumberUtils.INTEGER_ONE && movieData.getRating() <= MAXIMUM_RANGE)
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(MovieErrorEnum.NO_RANGE_MOVIE))))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new MovieException(MovieErrorEnum.NO_RANGE_RATING_MOVIE))))
                 .filter(movieData -> Objects.nonNull(movieDTO.getId()))
                 .flatMap(movieData -> findById(movieDTO.getId())
                         .map(movieDB -> editBuildMovie(movieDTO, movieDB))
@@ -50,7 +50,7 @@ public class MovieServices implements MovieFactory {
                 .switchIfEmpty(Mono.defer(() -> Mono.just(movieDTO)
                         .filter(user -> Objects.nonNull(movieDTO.getTitle()) && Objects.nonNull(movieDTO.getDirector()))
                         .map(this::saveBuildMovie)
-                        .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
+                        .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NO_EMPTY_FIELDS))))
                 ))
                 .flatMap(movieRepository::save)
                 .thenReturn(movieDTO);

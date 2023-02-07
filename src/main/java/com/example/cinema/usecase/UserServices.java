@@ -34,7 +34,7 @@ public class UserServices implements UserFactory {
     public Mono<UserDTO> saveUser(UserDTO userDTO) {
         return Mono.just(userDTO)
                 .filter(user -> StringUtils.isNotBlank(userDTO.getName()) && StringUtils.isNotBlank(userDTO.getLastname()))
-                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NON_EMPTY_FIELDS))))
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NO_EMPTY_FIELDS))))
                 .filter(userData -> Objects.nonNull(userData.getId()))
                 .flatMap(userData -> findById(userDTO.getId())
                         .map(userDB -> editBuildUser(userDTO, userDB))
