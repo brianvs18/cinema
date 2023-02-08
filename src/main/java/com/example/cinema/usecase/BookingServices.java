@@ -11,11 +11,10 @@ import com.example.cinema.model.Booking;
 import com.example.cinema.repository.BookingRepository;
 import com.example.cinema.usecase.common.functions.MovieListFunction;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -38,12 +37,6 @@ public class BookingServices implements BookingFactory {
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new BookingException(BookingErrorEnum.BOOKING_NOT_EXISTS))));
     }
 
-    public Mono<BookingDTO> findByUserId(String userId) {
-        return bookingRepository.findByUserId(userId)
-                .map(this::buildBooking)
-                .flatMap(this::buildBookingWithMovieList);
-    }
-
     public Flux<BookingDTO> findAllByUserId(String userId) {
         return bookingRepository.findAllByUserId(userId)
                 .map(this::buildBooking)
@@ -52,7 +45,7 @@ public class BookingServices implements BookingFactory {
 
     public Mono<BookingDTO> saveBooking(BookingDTO bookingDTO) {
         return Mono.just(bookingDTO)
-                .filter(bookingData -> Objects.nonNull(bookingData.getShowtimeId()) && Objects.nonNull(bookingData.getUserId()))
+                .filter(bookingData -> StringUtils.isNotBlank(bookingData.getShowtimeId()) && StringUtils.isNotBlank(bookingData.getUserId()))
                 .flatMap(booking -> showtimeServices.findById(booking.getShowtimeId())
                         .map(showtimeDTO -> BookingDocument.builder()
                                 .userId(bookingDTO.getUserId())

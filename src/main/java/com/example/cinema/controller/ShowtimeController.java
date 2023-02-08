@@ -27,4 +27,9 @@ public class ShowtimeController {
     public Mono<ShowtimeDTO> saveShowtime(@RequestBody ShowtimeDTO showtimeDTO) {
         return showtimeServices.saveShowtime(showtimeDTO);
     }
+
+    @GetMapping(path = "/api/showtime", params = {"movieId"})
+    public Flux<ShowtimeDTO> findAllCriteria(@RequestParam("movieId") String movieId) {
+        return showtimeServices.findByMovieIdCriteria(movieId);
+    }
 }

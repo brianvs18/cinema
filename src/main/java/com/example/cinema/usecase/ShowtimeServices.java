@@ -1,6 +1,7 @@
 package com.example.cinema.usecase;
 
 import com.example.cinema.dto.ShowtimeDTO;
+import com.example.cinema.entity.ShowtimeDocument;
 import com.example.cinema.enums.GenericErrorEnum;
 import com.example.cinema.enums.ShowtimeErrorEnum;
 import com.example.cinema.exceptions.GenericException;
@@ -10,6 +11,9 @@ import com.example.cinema.model.Showtime;
 import com.example.cinema.repository.ShowtimeRepository;
 import com.example.cinema.usecase.common.functions.MovieListFunction;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.mongodb.core.ReactiveMongoTemplate;
+import org.springframework.data.mongodb.core.query.Criteria;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -22,6 +26,7 @@ public class ShowtimeServices implements ShowtimeFactory {
 
     private final ShowtimeRepository showtimeRepository;
     private final MovieListFunction function;
+    private final ReactiveMongoTemplate reactiveMongoTemplate;
 
     public Flux<ShowtimeDTO> findAll() {
         return showtimeRepository.findAll()
@@ -69,5 +74,15 @@ public class ShowtimeServices implements ShowtimeFactory {
                                 .date(showtimeDocument.getDate())
                                 .movies(showtimeDocument.getMovies())
                                 .build()));
+    }
+
+    public Flux<ShowtimeDTO> findByMovieIdCriteria(String movieId) {
+        Query query = new Query(Criteria.where("movies").in(movieId));
+        return reactiveMongoTemplate.find(query, ShowtimeDocument.class)
+                .map(showtimeDocument -> ShowtimeDTO.builder()
+                        .id(showtimeDocument.getId())
+                        .date(showtimeDocument.getDate())
+                        .movies(showtimeDocument.getMovies())
+                        .build());
     }
 }
