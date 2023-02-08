@@ -63,8 +63,8 @@ public class ShowtimeServices implements ShowtimeFactory {
     public Flux<ShowtimeDTO> findByMovieId(String movieId) {
         return showtimeRepository.findAll()
                 .flatMap(showtimeDocument -> Flux.fromIterable(showtimeDocument.getMovies())
-                        .filter(s -> s.equals(movieId))
-                        .map(s -> ShowtimeDTO.builder()
+                        .filter(moviesIds -> moviesIds.equals(movieId))
+                        .map(showtime -> ShowtimeDTO.builder()
                                 .id(showtimeDocument.getId())
                                 .date(showtimeDocument.getDate())
                                 .movies(showtimeDocument.getMovies())
