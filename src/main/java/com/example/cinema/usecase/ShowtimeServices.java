@@ -37,7 +37,8 @@ public class ShowtimeServices implements ShowtimeFactory {
     public Mono<ShowtimeDTO> findById(String showtimeId) {
         return showtimeRepository.findById(showtimeId)
                 .map(this::buildShowtime)
-                .flatMap(this::buildShowtimeWithMovieList);
+                .flatMap(this::buildShowtimeWithMovieList)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new ShowtimeException(ShowtimeErrorEnum.SHOWTIME_IS_NOT_EXISTS))));
     }
 
     private Mono<ShowtimeDTO> buildShowtimeWithMovieList(Showtime showtime) {

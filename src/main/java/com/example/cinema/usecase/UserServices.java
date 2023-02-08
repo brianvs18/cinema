@@ -28,7 +28,8 @@ public class UserServices implements UserFactory {
 
     public Mono<UserDTO> findById(String userId) {
         return userRepository.findById(userId)
-                .map(this::buildUser);
+                .map(this::buildUser)
+                .switchIfEmpty(Mono.defer(() -> Mono.error(new UserException(UserErrorEnum.USER_IS_NOT_EXISTS))));
     }
 
     public Mono<UserDTO> saveUser(UserDTO userDTO) {
