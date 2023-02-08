@@ -22,6 +22,7 @@ import java.util.Objects;
 public class BookingServices implements BookingFactory {
 
     private final BookingRepository bookingRepository;
+    private final ShowtimeServices showtimeServices;
     private final MovieListFunction function;
 
     public Flux<BookingDTO> findAll() {
@@ -52,11 +53,14 @@ public class BookingServices implements BookingFactory {
     public Mono<BookingDTO> saveBooking(BookingDTO bookingDTO) {
         return Mono.just(bookingDTO)
                 .filter(bookingData -> Objects.nonNull(bookingData.getShowtimeId()) && Objects.nonNull(bookingData.getUserId()))
-                .map(bookingData -> BookingDocument.builder()
-                        .userId(bookingDTO.getUserId())
-                        .showtimeId(bookingDTO.getShowtimeId())
-                        .movies(bookingDTO.getMovies())
-                        .build())
+                .flatMap(booking -> showtimeServices.findById(booking.getShowtimeId())
+                        .map(showtimeDTO -> BookingDocument.builder()
+                                .userId(bookingDTO.getUserId())
+                                .showtimeId(showtimeDTO.getId())
+                                .movies(bookingDTO.getMovies())
+                                .build())
+                        .switchIfEmpty(Mono.defer(()-> Mono.error(new BookingException(BookingErrorEnum.NO_MOVIE_SHOWTIME))))
+                )
                 .switchIfEmpty(Mono.defer(() -> Mono.error(new GenericException(GenericErrorEnum.NO_EMPTY_FIELDS))))
                 .flatMap(bookingRepository::save)
                 .thenReturn(bookingDTO);
